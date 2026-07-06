@@ -15,7 +15,7 @@ const projection = d3.geoMercator()
 
 const path = d3.geoPath().projection(projection);
 
-// 2. Dados de ataques DDoS corrigidos
+// 2. Dados de ataques DDoS
 const ddosData = [
     { id: "USA", name: "Estados Unidos", attacks: 1540, coordinates: [-100, 40] },
     { id: "CHN", name: "China", attacks: 2300, coordinates: [105, 35] },
@@ -23,13 +23,14 @@ const ddosData = [
     { id: "RUS", name: "Rússia", attacks: 1900, coordinates: [100, 60] },
     { id: "DEU", name: "Alemanha", attacks: 450, coordinates: [10, 51] },
     { id: "IND", name: "Índia", attacks: 720, coordinates: [78, 21] },
-    { id: "GBR", name: "Reino Unido", attacks: 380, coordinates: [-2, 54] }, // Corrigido aqui
-    { id: "ZAF", name: "África do Sul", attacks: 210, coordinates: [24, -29] }
+    { id: "GBR", name: "Reino Unido", attacks: 380, coordinates: [-2, 55] }, // Coordenada ajustada
+    { id: "ZAF", name: "África do Sul", attacks: 210, coordinates: [24, -29] },
+    { id: "FRA", name: "França", attacks: 0, coordinates: [2, 46] } // Coordenada ajustada
 ];
 
 const attackMap = new Map(ddosData.map(d => [d.id, d]));
 
-// Escala de cores vibrantes para cibersegurança (do roxo ao vermelho vivo)
+// Escalas
 const colorScale = d3.scaleThreshold()
     .domain([200, 500, 1000, 1800])
     .range(["#2e1065", "#5b21b6", "#7c3aed", "#dc2626", "#991b1b"]);
@@ -43,9 +44,27 @@ const geoJsonUrl = "https://raw.githubusercontent.com/johan/world.geo.json/maste
 
 d3.json(geoJsonUrl).then(geoData => {
     
-    // Desenhar os países
-    svg.append("g")
-        .selectAll("path")
+    // NOVIDADE: Criar grupos para gerenciar a ordem de empilhamento (Z-index)
+    // Os círculos ficam no grupo de trás, os países no grupo da frente.
+    const backGroup = svg.append("g").attr("id", "back-layer");
+    const frontGroup = svg.append("g").attr("id", "front-layer");
+
+    // PASSOS INVERTIDOS:
+
+    // --- Passo A: Desenhar os Círculos (NO GRUPO DE TRÁS) ---
+    backGroup.selectAll("circle")
+        .data(ddosData.filter(d => d.attacks > 0)) // Desenha apenas se houver ataques
+        .enter()
+        .append("circle")
+        .attr("class", "attack-circle")
+        .attr("cx", d => projection(d.coordinates)[0])
+        .attr("cy", d => projection(d.coordinates)[1])
+        .attr("r", d => radiusScale(d.attacks))
+        .attr("fill", "#00f2fe"); // Ciano sólido
+        // mix-blend-mode e opacity foram removidos daqui
+
+    // --- Passo B: Desenhar os Países (NO GRUPO DA FRENTE) ---
+    frontGroup.selectAll("path")
         .data(geoData.features)
         .enter()
         .append("path")
@@ -55,12 +74,11 @@ d3.json(geoJsonUrl).then(geoData => {
             const countryId = d.id;
             const data = attackMap.get(countryId);
             
-            // Se o país tem dados cadastrados e tem ataques > 0, usa a escala.
-            // Se não tiver dados (ou for 0), retorna a cor de fundo neutra.
+            // Lógica condicional de preenchimento para as cores neutras
             if (data && data.attacks > 0) {
                 return colorScale(data.attacks);
             } else {
-                return "#1e293b"; // Cinza/azul escuro para países sem ataques
+                return "#1e293b"; // Neutro visível
             }
         })
         .on("mouseover", (event, d) => {
@@ -87,19 +105,6 @@ d3.json(geoJsonUrl).then(geoData => {
         .on("mouseleave", () => {
             d3.select("#tooltip").style("display", "none");
         });
-
-    // 4. Desenhar os Círculos de Ataques
-    svg.append("g")
-        .selectAll("circle")
-        .data(ddosData)
-        .enter()
-        .append("circle")
-        .attr("class", "attack-circle")
-        .attr("cx", d => projection(d.coordinates)[0])
-        .attr("cy", d => projection(d.coordinates)[1])
-        .attr("r", d => radiusScale(d.attacks))
-        .attr("fill", "#00f2fe")
-        .attr("style", "mix-blend-mode: screen;");
 
 }).catch(error => {
     console.error("Erro ao carregar o mapa:", error);

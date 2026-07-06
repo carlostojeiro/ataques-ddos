@@ -65,6 +65,19 @@ header p {
     box-shadow: 0 2px 10px rgba(0,0,0,0.3);
     transition: all 0.1s ease;
 }
+footer {
+    margin-top: 40px;
+    padding: 20px 0;
+    text-align: center;
+    border-top: 1px solid #1e293b; /* Linha sutil de separação */
+    font-size: 13px;
+    color: #64748b; /* Cinza focado em leitura secundária */
+    line-height: 1.6;
+}
+
+footer strong {
+    color: #94a3b8; /* Destaca levemente o termo 'Fonte dos Dados' */
+}
 
 #tooltip.hidden {
     display: none;

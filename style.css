@@ -72,14 +72,22 @@ footer {
     margin-top: 40px;
     padding: 20px 0;
     text-align: center;
-    border-top: 1px solid #1e293b; /* Linha sutil de separação */
+    border-top: 1px solid #1e293b;
     font-size: 13px;
-    color: #64748b; /* Cinza focado em leitura secundária */
+    color: #64748b;
     line-height: 1.6;
+    
+    /* Força o elemento a se comportar como bloco total e centralizar */
+    display: block;
+    width: 100%;
+    clear: both;
+    box-sizing: border-box;
 }
 
-footer strong {
-    color: #94a3b8; /* Destaca levemente o termo 'Fonte dos Dados' */
+/* Garante que os parágrafos internos também herdem o alinhamento */
+footer p {
+    margin: 6px 0;
+    text-align: center;
 }
 
 

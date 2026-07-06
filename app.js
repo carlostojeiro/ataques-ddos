@@ -8,6 +8,21 @@ const svg = d3.select("#map-container")
     .attr("width", "100%")
     .attr("height", "100%");
 
+// NOVIDADE: Criamos um grupo principal que vai conter TODAS as camadas do mapa.
+// É esse grupo que receberá o efeito de zoom e arrastar simultaneamente.
+const mainGroup = svg.append("g");
+
+// CONFIGURAÇÃO DO ZOOM: Ativa o botão de rolagem do mouse e o clique-e-arraste
+const zoomBehavior = d3.zoom()
+    .scaleExtent([1, 8]) // Define o zoom mínimo (1x) e máximo (8x)
+    .on("zoom", (event) => {
+        // Aplica a transformação geométrica (translação e escala) ao grupo principal
+        mainGroup.attr("transform", event.transform);
+    });
+
+// Vincula o comportamento de zoom diretamente ao container SVG principal
+svg.call(zoomBehavior);
+
 // Projeção Mercator
 const projection = d3.geoMercator()
     .scale(145)
@@ -29,7 +44,7 @@ const ddosData = [
 
 const attackMap = new Map(ddosData.map(d => [d.id, d]));
 
-// Escala Threshold para os países afetados (tons fortes de vermelho e roxo)
+// Escala Threshold para os países afetados
 const colorScale = d3.scaleThreshold()
     .domain([200, 500, 1000, 1800])
     .range(["#4c1d95", "#6d28d9", "#7c3aed", "#dc2626", "#b91c1c"]);
@@ -45,8 +60,10 @@ d3.json(geoJsonUrl).then(topoData => {
     
     const geoData = topojson.feature(topoData, topoData.objects.countries);
 
+    // ATENÇÃO: Agora anexamos as camadas dentro do 'mainGroup', e não direto no 'svg'
+    
     // CAMADA 1: Desenhar a malha de países
-    svg.append("g")
+    mainGroup.append("g")
         .selectAll("path")
         .data(geoData.features)
         .enter()
@@ -56,11 +73,9 @@ d3.json(geoJsonUrl).then(topoData => {
         .attr("fill", d => {
             const countryId = String(d.id).padStart(3, '0'); 
             const data = attackMap.get(countryId);
-            
-            // CORRIGIDO: Se não tiver ataques, usa um cinza-azulado médio (#334155) para o mapa aparecer contra o fundo escuro
             return (data && data.attacks > 0) ? colorScale(data.attacks) : "#334155"; 
         })
-        .attr("stroke", "#1e293b") // Borda fina escura entre os países para dar definição
+        .attr("stroke", "#1e293b") 
         .attr("stroke-width", "0.5px")
         .on("mouseover", (event, d) => {
             const countryId = String(d.id).padStart(3, '0');
@@ -87,8 +102,8 @@ d3.json(geoJsonUrl).then(topoData => {
             d3.select("#tooltip").style("display", "none");
         });
 
-    // CAMADA 2: Círculos de Ataques por CIMA
-    svg.append("g")
+    // CAMADA 2: Círculos de Ataques por CIMA (também dentro do mainGroup)
+    mainGroup.append("g")
         .selectAll("circle")
         .data(ddosData)
         .enter()
@@ -97,7 +112,7 @@ d3.json(geoJsonUrl).then(topoData => {
         .attr("cy", d => projection(d.coordinates)[1])
         .attr("r", d => radiusScale(d.attacks))
         .attr("fill", "#00f2fe")
-        .attr("fill-opacity", 0.6) // Brilho interno translúcido
+        .attr("fill-opacity", 0.6) 
         .attr("stroke", "#ffffff")
         .attr("stroke-width", 1)
         .style("pointer-events", "none"); 

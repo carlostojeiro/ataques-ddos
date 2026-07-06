@@ -56,13 +56,15 @@ const ddosData = [
 const attackMap = new Map(ddosData.map(d => [d.id, d]));
 
 // Escala Threshold ajustada para os volumes consolidados
+// Escala Threshold recalibrada para o Top 20
 const colorScale = d3.scaleThreshold()
-    .domain([10000, 30000, 50000, 80000])
+    .domain([10000, 20000, 40000, 60000])
     .range(["#4c1d95", "#6d28d9", "#7c3aed", "#dc2626", "#b91c1c"]);
 
+// Escala de raio dos círculos recalibrada para não sobrecarregar visualmente a Europa
 const radiusScale = d3.scaleSqrt()
     .domain([0, 90000])
-    .range([2, 38]);
+    .range([2, 32]);
 
 // 3. Link Oficial e Seguro do Atlas do D3 (JSON estático permitido pelo GitHub)
 const geoJsonUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";

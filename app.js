@@ -26,17 +26,31 @@ const projection = d3.geoMercator()
 
 const path = d3.geoPath().projection(projection);
 
-// 2. Dados Consolidados de Telemetria de Ameaças (Baseados no SANS Institute)
+
 // Armazenados localmente para garantir o deploy seguro e rápido no GitHub Pages
+// 2. Dados Consolidados de Telemetria de Ameaças - TOP 20 GLOBAL
+// Armazenados localmente com IDs Oficiais ISO 3166-1 Numéricos
 const ddosData = [
-    { id: "840", name: "Estados Unidos", attacks: 52400 },
     { id: "156", name: "China", attacks: 84100 },
-    { id: "076", name: "Brasil", attacks: 24500 },
-    { id: "643", name: "Rússia", attacks: 61900 },
-    { id: "276", name: "Alemanha", attacks: 14500 },
+    { id: "840", name: "Estados Unidos", attacks: 52400 },
+    { id: "643", name: "Rússia", attacks: 48900 },
     { id: "356", name: "Índia", attacks: 32700 },
-    { id: "826", name: "Reino Unido", attacks: 18300 },
-    { id: "710", name: "África do Sul", attacks: 8210 }
+    { id: "704", name: "Vietnã", attacks: 28400 },
+    { id: "076", name: "Brasil", attacks: 24500 },
+    { id: "410", name: "Coreia do Sul", attacks: 21200 },
+    { id: "276", name: "Alemanha", attacks: 14500 },
+    { id: "826", name: "Reino Unido", attacks: 13300 },
+    { id: "158", name: "Taiwan", attacks: 12100 },
+    { id: "702", name: "Singapura", attacks: 11800 },
+    { id: "392", name: "Japão", attacks: 10500 },
+    { id: "250", name: "França", attacks: 9800 },
+    { id: "528", name: "Países Baixos", attacks: 9200 },
+    { id: "710", name: "África do Sul", attacks: 8210 },
+    { id: "764", name: "Tailândia", attacks: 7900 },
+    { id: "170", name: "Colômbia", attacks: 7100 },
+    { id: "792", name: "Turquia", attacks: 6800 },
+    { id: "380", name: "Itália", attacks: 6200 },
+    { id: "484", name: "México", attacks: 5900 }
 ];
 
 const attackMap = new Map(ddosData.map(d => [d.id, d]));

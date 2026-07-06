@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Informativo: Ataques DDoS Global</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Monitoramento Global de Origem de Ataques DDoS</h1>
+            <p>Visualização informativa baseada em volume e intensidade por país.</p>
+        </header>
+        
+        <main>
+            <div id="map-container">
+                <div id="tooltip" class="hidden">
+                    <p><strong id="country-name">País</strong></p>
+                    <p>Total de Ataques: <span id="attack-count">0</span></p>
+                    <p>Nível de Risco: <span id="risk-level">Nenhum</span></p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

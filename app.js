@@ -16,7 +16,6 @@ const projection = d3.geoMercator()
 const path = d3.geoPath().projection(projection);
 
 // 2. Dados de ataques DDoS com IDs Numéricos Oficiais (ISO 3166-1 Numeric)
-// Isso impede divergências de chaves entre o arquivo e o código.
 const ddosData = [
     { id: "840", name: "Estados Unidos", attacks: 1540, coordinates: [-100, 40] }, // USA
     { id: "156", name: "China", attacks: 2300, coordinates: [105, 35] },          // CHN
@@ -31,7 +30,7 @@ const ddosData = [
 // Criando o mapa de busca rápida por ID numérico
 const attackMap = new Map(ddosData.map(d => [d.id, d]));
 
-// Escala Threshold: Valores bem distribuídos para uma paleta de alerta
+// Escala Threshold para as cores dos países afetados
 const colorScale = d3.scaleThreshold()
     .domain([200, 500, 1000, 1800])
     .range(["#2e1065", "#5b21b6", "#7c3aed", "#dc2626", "#991b1b"]);
@@ -40,16 +39,13 @@ const radiusScale = d3.scaleSqrt()
     .domain([0, 2500])
     .range([0, 35]);
 
-// 3. Link Oficial do TopoJSON/GeoJSON do ecossistema do D3 (110m de resolução, super leve)
+// 3. Link Oficial do Atlas do D3 (110m de resolução, leve e padronizado)
 const geoJsonUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
-// Carregando os dados e a extensão TopoJSON para converter em GeoJSON nativo
-Promise.all([
-    d3.json(geoJsonUrl),
-    d3.script("https://unpkg.com/topojson-client@3") // Garante a dependência de conversão em tempo de execução
-]).then(([topoData]) => {
+// Carrega os dados geográficos de forma direta
+d3.json(geoJsonUrl).then(topoData => {
     
-    // Converte os dados do formato compacto TopoJSON para GeoJSON reconhecido pelo D3
+    // Converte os dados do formato compacto TopoJSON para GeoJSON reconhecido pelo D3 usando o objeto injetado no HTML
     const geoData = topojson.feature(topoData, topoData.objects.countries);
 
     // CAMADA 1: Desenhar a malha de países
@@ -61,7 +57,7 @@ Promise.all([
         .attr("d", path)
         .attr("class", "country")
         .attr("fill", d => {
-            // d.id aqui puxa o código numérico padrão (ex: "076" para o Brasil)
+            // d.id extrai o código numérico padrão da ONU (ex: "076" para o Brasil)
             const countryId = String(d.id).padStart(3, '0'); 
             const data = attackMap.get(countryId);
             
@@ -106,7 +102,7 @@ Promise.all([
         .attr("fill-opacity", 0.5)
         .attr("stroke", "#00f2fe")
         .attr("stroke-width", 1.5)
-        .style("pointer-events", "none"); // Essencial para o mouse passar direto para o país
+        .style("pointer-events", "none"); // Garante que o mouse interaja diretamente com o país abaixo
 
 }).catch(error => {
     console.error("Erro na renderização do D3:", error);

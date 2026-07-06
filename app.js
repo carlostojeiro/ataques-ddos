@@ -54,8 +54,14 @@ d3.json(geoJsonUrl).then(geoData => {
         .attr("fill", d => {
             const countryId = d.id;
             const data = attackMap.get(countryId);
-            // Se o país tiver ataques, aplica a cor da escala. Se não tiver, usa um cinza azulado visível
-            return data ? colorScale(data.attacks) : "#1e293b"; 
+            
+            // Se o país tem dados cadastrados e tem ataques > 0, usa a escala.
+            // Se não tiver dados (ou for 0), retorna a cor de fundo neutra.
+            if (data && data.attacks > 0) {
+                return colorScale(data.attacks);
+            } else {
+                return "#1e293b"; // Cinza/azul escuro para países sem ataques
+            }
         })
         .on("mouseover", (event, d) => {
             const countryId = d.id;
